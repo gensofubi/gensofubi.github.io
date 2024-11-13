@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Trails: Accelerated Image Processing through Parallel Computing</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+    h1 {
+        font-size: 24px;
+    }
+    h2 {
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+    <h1>Star Trails: Accelerated Image Processing through Parallel Computing</h1>
+    <h2>Team Member</h2>
+    <p>Yueyan Zhang, Tao Zhu</p>
+
+    <h2>URL</h2>
+    <p><a href="https://gensofubi.github.io/15-618_main">https://gensofubi.github.io/15-618_main</a></p>
+
+    <h2>Summary</h2>
+    <p>We are going to accelerate the process of generating star trail images from a large number of sky images using parallel computing.</p>
+
+    <h2>Background</h2>
+    <p>Star trails are continuously moving orbits produced by stars in long-exposure images. Ideally, we would simply stack many consecutive, long-exposure images of the sky to create a star trail. This process has obvious SIMD characteristics and will be our task i to accelerate through parallel computing.</p>
+    <p>However, long exposures can affect image quality. Taking a large number of images consecutively is also a challenge for the device's battery capacity and storage space. Therefore, we are going to develop an algorithm to identify star points from photos taken at intervals and match them one by one, and then create a continuous star trail by interpolating frames. We are going to use parallel computing to improve the speed of this process as task ii.</p>
+
+    <h2>The Challenge</h2>
+    <p>*Add the Challenge*</p>
+
+    <h2>Resources</h2>
+    <p>We plan to start from scratch and use the CPU/GPU on our personal computers.</p>
+
+    <h2>Goals and Deliverables</h2>
+    <p><strong>Plan to Achieve:</strong></p>
+    <ol>
+        <li>Considerable speedup of task i (generating star trail from consecutive images)</li>
+        <li>Considerable speedup of task ii (generating star from images taken at intervals) with short intervals</li>
+    </ol>
+    <p><strong>Hope to Achieve:</strong></p>
+    <ol>
+        <li>Considerable speedup of task ii (generating star from images taken at intervals) with long intervals, which significantly increase difficulty of mapping star points</li>
+        <li>Adapting different programming models and compare the performance</li>
+    </ol>
+    <p><strong>Deliverables:</strong> What we plan to show at the poster session includes the input and output images of our programs, and speedup graphs of different approaches.</p>
+
+    <h2>Platform Choice</h2>
+    <p>We expect our tasks to have workload similar to a Photoshop image process task, so our personal computer is good for our needs (CPU: AMD Ryzen 7, GPU: NVIDIA GeForce RTX 2060)</p>
+    <p>We plan to use CUDA and OpenMP, and compare the performance on different models.</p>
+
+    <h2>Schedule</h2>
+    <p>Nov 6 - Nov 13: Create project proposal.</p>
+    <p>Nov 13 - Nov 20: Create serial version of our program.</p>
+    <p>Nov 20 - Nov 27: Complete parallel version of task i.</p>
+    <p>Nov 27 - Dec 4: Complete parallel version of task ii.</p>
+    <p>Dec 4 - Dec 11: Further optimize if speedup isn't satisfying. Adapting different programming models.</p>
+</body>
+</html>
