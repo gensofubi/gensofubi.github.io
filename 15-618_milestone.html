@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Trails: Accelerated Image Processing through Parallel Computing</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+    h1 {
+        font-size: 24px;
+    }
+    h2 {
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+    <h1>Star Trails: Accelerated Image Processing through Parallel Computing</h1>
+    <h2>Team Member</h2>
+    <p>Yueyan Zhang, Tao Zhu</p>
+
+    <h2>URL</h2>
+    <p><a href="https://gensofubi.github.io/15-618_main">https://gensofubi.github.io/15-618_main</a></p>
+
+    <h2>Schedule</h2>
+    <p>Nov 6 - Nov 13: Create project proposal.(Done)</p>
+    <p>Nov 13 - Nov 20: Create serial version of our program.(Done)</p>
+    <p>Nov 20 - Nov 27: Complete parallel version of task i.(Done)</p>
+    Detailed schedule for the following weeks:(TODO)
+    <p>Nov 27 - Dec 4: Complete parallel version of task ii.</p>
+    <p>Dec 4 - Dec 11: Further optimize if speedup isn't satisfying. Adapting different programming models.</p>
+
+    <h2>Completed Work</h2>
+    <p>1. We have finished the serial version of trail generation.</p>
+    <p>2. We have implemented the MPI version of parallelism for data loading & max stack part.</p> 
+    <p>3. We have implemented the OpenMP version of parallelism for max stack part.</p> 
+
+    <h2>Preliminary Results</h2>
+    <h3>Message Passing Model</h3>
+    <p>We achieve parallelism by having each process compute a portion of the data and then use message communication protocols to combine the results. The speedup effect is as follows:</p>
+    <table border="1">
+        <tr>
+          <th>Process num</th>
+          <th>1</th>
+          <th>2</th>
+          <th>4</th>
+          <th>8</th>
+        </tr>
+        <tr>
+          <td>Total speed-up</td>
+          <td>1x</td>
+          <td>1.92x</td>
+          <td>3.67x</td>
+          <td>6.07x</td>
+        </tr>
+        <tr>
+            <td>Data loading speed-up</td>
+            <td>1x</td>
+            <td>1.98x</td>
+            <td>3.75x</td>
+            <td>6.43x</td>
+        </tr>
+        <tr>
+          <td>Max stack speed-up</td>
+          <td>1x</td>
+          <td>1.12x</td>
+          <td>1.33x</td>
+          <td>1.50x</td>
+        </tr>
+    </table>
+    <p>From this, we can observe that the speedup for the data loading part is nearly perfect, but the speedup for the max stack part is quite small. This is because the message communication involves transferring the entire pixel data of the image, and the large size leads to significant communication overhead. In the future, we can further investigate better ways to transmit the data.</p>
+
+    <h3>Data Parallel Model</h3>
+    <p>We achieve parallelism by having each process taking a portion of the data-loading and max-stack-computing tasks. The speedup effect is as follows:</p>
+    <table border="1">
+        <tr>
+          <th>Process num</th>
+          <th>1</th>
+          <th>2</th>
+          <th>4</th>
+          <th>8</th>
+        </tr>
+        <tr>
+          <td>Total speed-up</td>
+          <td>1x</td>
+          <td>1.72x</td>
+          <td>2.60x</td>
+          <td>4.75x</td>
+        </tr>
+        <tr>
+            <td>Data loading speed-up</td>
+            <td>1x</td>
+            <td>1.73x</td>
+            <td>2.70x</td>
+            <td>5.19x</td>
+        </tr>
+        <tr>
+          <td>Max stack speed-up</td>
+          <td>1x</td>
+          <td>1.48x</td>
+          <td>1.55x</td>
+          <td>1.76x</td>
+        </tr>
+    </table>
+    <p>From this, we can observe that the speedup for the data loading part is good, but the speedup for the max stack part is still quite small. This is because the accessing and updating of the Max Stack result is critical and limited the parallelism of the program.</p>
+
+    <h2>Expected Poster Session Stuff</h2>
+</body>
+</html>
