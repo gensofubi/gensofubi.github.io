@@ -31,11 +31,117 @@
     <p>We are going to accelerate the process of generating star trail images from a large number of sky images using parallel computing.</p>
 
     <h2>Background</h2>
-    <p>Star trails are continuously moving orbits produced by stars in long-exposure images. Ideally, we would simply stack many consecutive, long-exposure images of the sky to create a star trail. This process has obvious SIMD characteristics and will be our task i to accelerate through parallel computing.</p>
-    <p>However, long exposures can affect image quality. Taking a large number of images consecutively is also a challenge for the device's battery capacity and storage space. Therefore, we are going to develop an algorithm to identify star points from photos taken at intervals and match them one by one, and then create a continuous star trail by interpolating frames. We are going to use parallel computing to improve the speed of this process as task ii.</p>
+    <p>Star trails are continuously moving orbits produced by stars which can be observed under hours of exposure. Due to the cost of long exposure, in actual photography, the photographer would typically choose to take more than 100 continuous photos with exposure times of around 30 seconds each, and later combine them in post-processing to create the star trails.The image below demonstrates the expected effect after image processing. Several photos can be combined to create the star trail effect shown in the image. </p>
+    <div style="text-align: center;">
+        <img src="./example.jpg" alt="Star Trails" style="width: 80%; height: auto;">
+    </div>
+    <p>To reach the goal, we divide it into 2 tasks: </p>
+    <p>1. Ideally, we would simply stack many consecutive, long-exposure images of the sky with maxinum values. Since each pixel is calculated independently, this process has obvious SIMD characteristics and will be our task i to accelerate through parallel computing.</p>
+<h3>Python Code for Star Trails Generation Task#1</h3>
+<pre><code>
+from PIL import Image
+import numpy as np
+import os
 
+# Set the folder path containing the starry sky photos
+image_folder = 'path_to_your_images'
+
+# Get the list of all image files
+image_files = sorted([file for file in os.listdir(image_folder) if file.endswith(('jpg', 'jpeg', 'png'))])
+
+# Initialize an empty numpy array to store the stacked result
+stack_result = None
+
+for idx, file in enumerate(image_files):
+    image_path = os.path.join(image_folder, file)
+    img = Image.open(image_path)
+    img_array = np.array(img)
+
+    if stack_result is None:
+        # First iteration, initialize the result array
+        stack_result = img_array
+    else:
+        # Take the maximum value for each pixel
+        stack_result = np.maximum(stack_result, img_array)
+
+    print(f"Processed {idx + 1}/{len(image_files)} images")
+
+# Convert the result array to an image and save it
+result_image = Image.fromarray(stack_result)
+result_image.save('star_trails_result.jpg')
+print("Star trails generation complete, result saved as star_trails_result.jpg")
+</code></pre>
+
+    <p>2. Due to the short exposure stitching, there will inevitably be breaks in the photos created through this combination. Therefore, we will utilize image recognition technology to identify the positions of the star trails and fill in the gaps.</p>
+<h2>Python Code for Star Trails Generation Task#2</h2>
+<pre><code>
+import cv2
+import numpy as np
+import os
+
+# Set the folder path for starry sky photos
+image_folder = 'path_to_your_images'
+
+# Get the list of all image files, sorted by file name
+image_files = sorted([f for f in os.listdir(image_folder) if f.endswith(('jpg', 'jpeg', 'png'))])
+
+# Initialize the result image
+stack_result = None
+
+for idx in range(len(image_files) - 1):
+    # Read the two adjacent images
+    img1_path = os.path.join(image_folder, image_files[idx])
+    img2_path = os.path.join(image_folder, image_files[idx + 1])
+    img1 = cv2.imread(img1_path)
+    img2 = cv2.imread(img2_path)
+    
+    # Convert images to grayscale
+    gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    
+    # Detect star points using a simple threshold
+    _, thresh1 = cv2.threshold(gray1, 30, 255, cv2.THRESH_BINARY)
+    _, thresh2 = cv2.threshold(gray2, 30, 255, cv2.THRESH_BINARY)
+    
+    # Find star points
+    keypoints1 = cv2.findNonZero(thresh1)
+    keypoints2 = cv2.findNonZero(thresh2)
+    
+    # Process if star points are found
+    if keypoints1 is not None and keypoints2 is not None:
+        # Simple matching (assuming star point count and order correspond, improvements needed)
+        min_len = min(len(keypoints1), len(keypoints2))
+        for i in range(min_len):
+            pt1 = tuple(keypoints1[i][0])
+            pt2 = tuple(keypoints2[i][0])
+            # Draw lines on img1
+            cv2.line(img1, pt1, pt2, (255, 255, 255), 1)
+    
+    # Stack the result images
+    if stack_result is None:
+        stack_result = img1.astype(np.float32)
+    else:
+        stack_result = np.maximum(stack_result, img1.astype(np.float32))
+    
+    print(f"Processed {idx + 1}/{len(image_files) - 1} images")
+
+# Process the last image
+last_image_path = os.path.join(image_folder, image_files[-1])
+last_image = cv2.imread(last_image_path)
+stack_result = np.maximum(stack_result, last_image.astype(np.float32))
+
+# Save the result
+final_image = stack_result.astype(np.uint8)
+cv2.imwrite('star_trail_filled_gaps.jpg', final_image)
+print("Star trail gap filling complete, result saved as star_trail_filled_gaps.jpg")
+</code></pre>
     <h2>The Challenge</h2>
-    <p>*Add the Challenge*</p>
+    <p>The main challenges for our project are: </p>
+    <h4> Data Dependencies: Sequential processing requirements limit parallelism. </h3>
+    <p> For task2, to fill the gap, we inherently need knowledge of previous computations. This means that to compute the value for a given pixel in the current image, all prior images' contributions to that pixel must be known. These cause difficulties for </p>
+    
+    <h4>Memory Constraints: High memory usage and bandwidth demand careful management.</h3>
+    <p> Each high-resolution image can be several megabytes or even gigabytes in size. Processing a large number of such images requires a carefule design of load and store sequence between memory and disk to avoid the bottleneck in memory capacity and bandwidth.
 
     <h2>Resources</h2>
     <p>We plan to start from scratch and use the CPU/GPU on our personal computers.</p>
